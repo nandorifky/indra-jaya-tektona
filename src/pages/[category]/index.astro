@@ -1,0 +1,39 @@
+---
+import { getCollection } from 'astro:content';
+import Layout from '../../layouts/Layout.astro';
+
+export async function getStaticPaths() {
+  const products = await getCollection('products');
+  const uniqueCategories = [...new Set(products.map((p) => p.data.category))];
+  return uniqueCategories.map((category) => {
+    const filteredProducts = products.filter((p) => p.data.category === category);
+    return { params: { category }, props: { products: filteredProducts } };
+  });
+}
+
+const { category } = Astro.params;
+const { products } = Astro.props;
+const title = category.replace(/-/g, ' ').toUpperCase();
+---
+
+<Layout title={`Katalog ${title} - Indra Jaya Tektona`}>
+    <header class="bg-ijt-dark text-white py-16 border-b-4 border-ijt-gold text-center">
+        <h1 class="text-4xl font-black">{title}</h1>
+    </header>
+
+    <main class="py-16 bg-white min-h-screen">
+        <div class="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+            {products.map((product) => (
+                <a href={`/${category}/${product.slug}`} class="group border-2 border-ijt-dark bg-white hover:-translate-y-2 transition-transform duration-300">
+                    <div class="aspect-square border-b-2 border-ijt-dark overflow-hidden bg-gray-100">
+                        <img src={product.data.image} alt={product.data.name} class="w-full h-full object-cover group-hover:scale-105 transition-transform" />
+                    </div>
+                    <div class="p-4">
+                        <h3 class="font-black uppercase text-sm group-hover:text-ijt-gold">{product.data.name}</h3>
+                        <div class="mt-4 text-xs font-bold uppercase text-center bg-gray-50 py-2 border border-gray-200 group-hover:bg-ijt-dark group-hover:text-white">Lihat Detail</div>
+                    </div>
+                </a>
+            ))}
+        </div>
+    </main>
+</Layout>
