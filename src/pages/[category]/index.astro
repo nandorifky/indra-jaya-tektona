@@ -1,0 +1,100 @@
+---
+import { getCollection } from 'astro:content';
+import Layout from '../../layouts/Layout.astro';
+
+// 1. Definisikan Kategori apa saja yang valid (Sesuai database kita)
+export async function getStaticPaths() {
+  const products = await getCollection('products');
+  // Ambil unik kategori
+  const uniqueCategories = [...new Set(products.map((p) => p.data.category))];
+
+  return uniqueCategories.map((category) => {
+    // Filter produk yang sesuai kategori ini saja
+    const filteredProducts = products.filter((p) => p.data.category === category);
+    return {
+      params: { category },
+      props: { products: filteredProducts },
+    };
+  });
+}
+
+const { category } = Astro.params;
+const { products } = Astro.props;
+
+// Judul Halaman Cantik (misal: "alat-lab-tanah" jadi "Alat Lab Tanah")
+const title = category.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+---
+
+<Layout title={`Jual ${title} Terlengkap - Indra Jaya Tektona`} description={`Katalog ${title} standar SNI/ASTM. Tersedia berbagai tipe dan kapasitas untuk kebutuhan proyek teknik sipil.`}>
+    
+    <header class="bg-ijt-dark text-white py-16 border-b-4 border-ijt-gold">
+        <div class="max-w-7xl mx-auto px-6 text-center">
+            <span class="font-mono text-xs font-bold text-ijt-gold uppercase tracking-widest mb-2 block">Katalog Produk</span>
+            <h1 class="text-4xl md:text-5xl font-black uppercase tracking-tight mb-4">{title}</h1>
+            <p class="text-gray-400 max-w-2xl mx-auto text-lg">Menampilkan {products.length} alat uji kualitas terbaik untuk kebutuhan laboratorium dan lapangan.</p>
+        </div>
+    </header>
+
+    <div class="border-b border-gray-200 bg-gray-50 py-3">
+        <div class="max-w-7xl mx-auto px-6 text-xs font-mono font-bold uppercase tracking-widest text-gray-500">
+            <a href="/" class="hover:text-ijt-gold">Home</a> 
+            <span class="mx-2">/</span>
+            <span class="text-ijt-dark">{title}</span>
+        </div>
+    </div>
+
+    <main class="py-16 bg-white min-h-screen">
+        <div class="max-w-7xl mx-auto px-6">
+            
+            {products.length > 0 ? (
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+                    {products.map((product) => (
+                        <a href={`/${category}/${product.slug}`} class="group border-2 border-ijt-dark bg-white hover:-translate-y-2 transition-transform duration-300 flex flex-col h-full">
+                            <div class="relative bg-gray-100 aspect-square border-b-2 border-ijt-dark overflow-hidden">
+                                <img 
+                                    src={product.data.image} 
+                                    alt={product.data.name} 
+                                    class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 mix-blend-multiply"
+                                    loading="lazy"
+                                />
+                                {product.data.featured && (
+                                    <span class="absolute top-3 left-3 bg-ijt-gold text-ijt-dark text-[10px] font-black uppercase px-2 py-1 border border-ijt-dark">
+                                        Unggulan
+                                    </span>
+                                )}
+                            </div>
+                            
+                            <div class="p-6 flex flex-col flex-grow">
+                                <h3 class="text-lg font-black uppercase leading-tight mb-2 group-hover:text-ijt-gold transition-colors line-clamp-2">
+                                    {product.data.name}
+                                </h3>
+                                
+                                {/* Specs Mini (Ambil 2 pertama) */}
+                                <div class="mt-auto pt-4 border-t border-dashed border-gray-300">
+                                    <ul class="text-xs text-gray-600 space-y-1 font-mono">
+                                        {product.data.specs && Object.entries(product.data.specs).slice(0, 2).map(([k, v]) => (
+                                            <li class="flex justify-between">
+                                                <span>{k}:</span> 
+                                                <span class="font-bold text-ijt-dark">{v}</span>
+                                            </li>
+                                        ))}
+                                    </ul>
+                                </div>
+                                
+                                <div class="mt-4 w-full py-2 bg-gray-50 text-ijt-dark font-bold text-xs uppercase text-center border border-gray-200 group-hover:bg-ijt-dark group-hover:text-white transition-colors">
+                                    Lihat Spesifikasi
+                                </div>
+                            </div>
+                        </a>
+                    ))}
+                </div>
+            ) : (
+                <div class="text-center py-20">
+                    <p class="text-gray-500 text-lg">Belum ada produk di kategori ini.</p>
+                    <a href="/" class="text-ijt-gold font-bold hover:underline mt-4 inline-block">Kembali ke Home</a>
+                </div>
+            )}
+            
+        </div>
+    </main>
+</Layout>
