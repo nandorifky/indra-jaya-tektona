@@ -1,0 +1,291 @@
+---
+// src/layouts/Layout.astro
+
+interface Props {
+	title: string;
+	description?: string;
+	image?: string;
+	type?: 'website' | 'article';
+}
+
+const { 
+	title, 
+	description = "Distributor Alat Laboratorium Teknik Sipil Terlengkap. Jual alat uji tanah, beton, aspal, batuan, dan mining equipment. Bergaransi & Terkalibrasi KAN.",
+	image = "/og-image-default.jpg",
+	type = "website"
+} = Astro.props;
+
+const canonicalURL = new URL(Astro.url.pathname, Astro.site || "https://indrajayatektona.com");
+
+// ICONS
+const iconMenu = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>`;
+const iconArrow = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17L17 7"/><path d="M7 7h10v10"/></svg>`;
+const iconClose = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>`;
+---
+
+<!doctype html>
+<html lang="id" class="scroll-smooth">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width" />
+		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+		<meta name="generator" content={Astro.generator} />
+        <link rel="sitemap" href="/sitemap-index.xml" />
+
+		<title>{title} | Indra Jaya Tektona</title>
+		<meta name="title" content={`${title} | Indra Jaya Tektona`} />
+		<meta name="description" content={description} />
+        <link rel="canonical" href={canonicalURL} />
+        <meta name="robots" content="index, follow" />
+
+		<meta property="og:type" content={type} />
+		<meta property="og:url" content={canonicalURL} />
+		<meta property="og:title" content={`${title} | Indra Jaya Tektona`} />
+		<meta property="og:description" content={description} />
+		<meta property="og:image" content={image} />
+
+		<link rel="preconnect" href="https://fonts.googleapis.com">
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+		<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+	</head>
+	
+    <body class="bg-ijt-base text-ijt-dark font-sans antialiased selection:bg-ijt-gold selection:text-white flex flex-col min-h-screen relative">
+		
+<header class="sticky top-0 z-50 bg-white border-b-2 border-ijt-dark">
+            <div class="max-w-7xl mx-auto px-6 h-20 flex justify-between items-center">
+                <a href="/" class="group flex items-center gap-2 select-none">
+                    <div class="font-black text-lg md:text-xl tracking-tighter uppercase border-2 border-ijt-dark px-3 py-1 bg-ijt-base shadow-[4px_4px_0px_0px_rgba(31,33,36,1)] group-hover:translate-x-[2px] group-hover:translate-y-[2px] group-hover:shadow-none transition-all">
+                        INDRA JAYA <span class="text-ijt-gold">TEKTONA</span>
+                    </div>
+                </a>
+
+                <nav class="hidden md:flex gap-8 font-bold text-sm tracking-wide items-center">
+                    <a href="/produk" class="hover:text-ijt-gold hover:underline decoration-2 underline-offset-4 transition-all">KATALOG PRODUK</a>
+                    <a href="/layanan" class="hover:text-ijt-gold hover:underline decoration-2 underline-offset-4 transition-all">LAYANAN</a>
+                    <a href="/tentang" class="hover:text-ijt-gold hover:underline decoration-2 underline-offset-4 transition-all">TENTANG KAMI</a>
+                    
+                    <a href="https://wa.me/628xxxxxxxx" class="bg-ijt-dark text-white px-5 py-2 font-bold text-sm hover:bg-ijt-gold hover:text-ijt-dark border-2 border-transparent hover:border-ijt-dark flex items-center gap-2 transition-all">
+                        MINTA PENAWARAN
+                        <span class="w-4 h-4" set:html={iconArrow} />
+                    </a>
+                </nav>
+
+                <button id="menu-toggle" class="md:hidden text-ijt-dark p-2 border-2 border-transparent focus:border-ijt-dark active:bg-gray-100" aria-label="Menu">
+                    <div class="w-8 h-8" set:html={iconMenu} />
+                </button>
+            </div>
+
+            <div id="mobile-menu" class="hidden md:hidden bg-ijt-base border-t-2 border-ijt-dark absolute w-full left-0 top-20 shadow-lg">
+                <nav class="flex flex-col p-6 gap-4 font-bold">
+                    <a href="/produk" class="block py-2 border-b border-gray-200 hover:text-ijt-gold">KATALOG PRODUK</a>
+                    <a href="/layanan" class="block py-2 border-b border-gray-200 hover:text-ijt-gold">LAYANAN & KALIBRASI</a>
+                    <a href="/tentang" class="block py-2 border-b border-gray-200 hover:text-ijt-gold">TENTANG KAMI</a>
+                <button class="btn-rfq mt-4 bg-ijt-gold text-ijt-dark px-5 py-3 text-center border-2 border-ijt-dark shadow-[4px_4px_0px_0px_rgba(31,33,36,1)] active:shadow-none active:translate-x-[2px] active:translate-y-[2px] w-full font-bold">
+                    MINTA PENAWARAN
+                </button>
+                </nav>
+            </div>
+        </header>
+
+        <div class="flex-grow">
+    		<slot />
+        </div>
+
+<footer class="bg-ijt-base pt-16 border-t-4 border-ijt-dark mt-auto">
+            <div class="max-w-7xl mx-auto px-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-12">
+                    
+                    <div class="space-y-6">
+                        <div class="font-black text-lg tracking-tight uppercase border-2 border-ijt-dark px-3 py-1 bg-white inline-block">
+                            INDRA JAYA <span class="text-ijt-gold">TEKTONA</span>
+                        </div>
+                        <p class="text-sm text-gray-600 leading-relaxed font-medium">
+                            Mitra terpercaya penyediaan alat laboratorium teknik sipil, mekanika tanah, beton, aspal, dan batuan. Melayani pengiriman ke seluruh Indonesia.
+                        </p>
+                    </div>
+
+                    <div>
+                        <h4 class="font-black text-ijt-dark uppercase tracking-wider mb-4 border-b-2 border-ijt-gold inline-block pb-1">Kategori Utama</h4>
+                        <ul class="space-y-3 text-sm font-semibold text-gray-500">
+                            <li><a href="/alat-lab-tanah" class="hover:text-ijt-dark hover:translate-x-1 transition-transform inline-block">Alat Lab Tanah</a></li>
+                            <li><a href="/alat-lab-beton" class="hover:text-ijt-dark hover:translate-x-1 transition-transform inline-block">Alat Lab Beton</a></li>
+                            <li><a href="/alat-lab-aspal" class="hover:text-ijt-dark hover:translate-x-1 transition-transform inline-block">Alat Lab Aspal</a></li>
+                            <li><a href="/alat-lab-batuan" class="hover:text-ijt-dark hover:translate-x-1 transition-transform inline-block">Alat Lab Batuan</a></li>
+                            <li><a href="/mining-equipment" class="hover:text-ijt-dark hover:translate-x-1 transition-transform inline-block">Mining Equipment</a></li>
+                        </ul>
+                    </div>
+
+                    <div>
+                        <h4 class="font-black text-ijt-dark uppercase tracking-wider mb-4 border-b-2 border-ijt-gold inline-block pb-1">Dukungan</h4>
+                        <ul class="space-y-3 text-sm font-semibold text-gray-500">
+                            <li><a href="/cara-pemesanan" class="hover:text-ijt-dark hover:translate-x-1 transition-transform inline-block">Cara Pemesanan</a></li>
+                            <li><a href="/faq" class="hover:text-ijt-dark hover:translate-x-1 transition-transform inline-block">FAQ Teknis</a></li>
+                            <li><a href="/garansi" class="hover:text-ijt-dark hover:translate-x-1 transition-transform inline-block">Klaim Garansi</a></li>
+                            <li><a href="/privacy" class="hover:text-ijt-dark hover:translate-x-1 transition-transform inline-block">Privacy Policy</a></li>
+                        </ul>
+                    </div>
+
+                    <div>
+                        <h4 class="font-black text-ijt-dark uppercase tracking-wider mb-4 border-b-2 border-ijt-gold inline-block pb-1">Hubungi Kami</h4>
+                        <address class="not-italic text-sm text-gray-600 space-y-4 font-medium">
+                            <div class="flex gap-3 items-start">
+                                <span class="font-bold text-ijt-gold">A.</span>
+                                <span>Jl. [Nama Jalan] No. XX<br>Kec. [Kecamatan], [Kota]<br>Jawa Barat 17XXX</span>
+                            </div>
+                            <div class="flex gap-3 items-center">
+                                <span class="font-bold text-ijt-gold">P.</span>
+                                <a href="tel:+62812xxxx" class="hover:text-ijt-dark hover:underline">0812-XXXX-XXXX</a>
+                            </div>
+                            <div class="flex gap-3 items-center">
+                                <span class="font-bold text-ijt-gold">E.</span>
+                                <a href="mailto:sales@indrajayatektona.com" class="hover:text-ijt-dark hover:underline">sales@indrajayatektona.com</a>
+                            </div>
+                        </address>
+                    </div>
+                </div>
+
+                <div class="border-t-2 border-gray-200 py-8 flex flex-col md:flex-row justify-between items-center text-xs font-mono font-bold text-gray-400">
+                    <p>&copy; {new Date().getFullYear()} CV. INDRA JAYA TEKTONA. ALL RIGHTS RESERVED.</p>
+                    <div class="flex gap-4 mt-4 md:mt-0">
+                        <a href="/sitemap" class="hover:text-ijt-dark">SITEMAP</a>
+                        <a href="/terms" class="hover:text-ijt-dark">TERMS</a>
+                    </div>
+                </div>
+            </div>
+        </footer>
+
+        <dialog id="rfq-modal" class="bg-transparent p-0 w-full h-full max-w-none max-h-none backdrop:bg-ijt-dark/80 backdrop:backdrop-blur-sm z-50 fixed inset-0 flex items-center justify-center pointer-events-none open:pointer-events-auto">
+            <div class="modal-content bg-white border-4 border-ijt-dark w-full max-w-lg m-4 p-0 shadow-[10px_10px_0px_0px_#C8A652] relative transform scale-95 opacity-0 transition-all duration-300">
+                
+                <div class="bg-ijt-base border-b-2 border-ijt-dark p-6 flex justify-between items-center">
+                    <h3 class="font-black text-xl uppercase tracking-tight">Form Permintaan Penawaran</h3>
+                    <button id="close-modal" class="text-gray-500 hover:text-red-600 transition-colors p-1">
+                        <div class="w-8 h-8" set:html={iconClose} />
+                    </button>
+                </div>
+
+                <div class="p-6 md:p-8">
+                    <form id="rfq-form" class="space-y-5">
+                        <div>
+                            <label for="rfq-name" class="block text-sm font-bold mb-1 uppercase text-gray-500">Nama Lengkap <span class="text-red-500">*</span></label>
+                            <input type="text" id="rfq-name" required class="w-full bg-gray-50 border-2 border-gray-200 p-3 focus:outline-none focus:border-ijt-gold focus:bg-white font-medium placeholder-gray-300 transition-colors" placeholder="Contoh: Budi Santoso">
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                            <div>
+                                <label for="rfq-city" class="block text-sm font-bold mb-1 uppercase text-gray-500">Domisili (Kota) <span class="text-gray-300 font-normal normal-case">(Opsional)</span></label>
+                                <input type="text" id="rfq-city" class="w-full bg-gray-50 border-2 border-gray-200 p-3 focus:outline-none focus:border-ijt-gold focus:bg-white font-medium placeholder-gray-300 transition-colors" placeholder="Jakarta">
+                            </div>
+                            <div>
+                                <label for="rfq-org" class="block text-sm font-bold mb-1 uppercase text-gray-500">Asal Instansi <span class="text-red-500">*</span></label>
+                                <input type="text" id="rfq-org" required class="w-full bg-gray-50 border-2 border-gray-200 p-3 focus:outline-none focus:border-ijt-gold focus:bg-white font-medium placeholder-gray-300 transition-colors" placeholder="PT. X / Dinas PU / Pribadi">
+                            </div>
+                        </div>
+
+                        <div>
+                            <label for="rfq-product" class="block text-sm font-bold mb-1 uppercase text-gray-500">Kebutuhan Produk <span class="text-red-500">*</span></label>
+                            <textarea id="rfq-product" required rows="3" class="w-full bg-gray-50 border-2 border-gray-200 p-3 focus:outline-none focus:border-ijt-gold focus:bg-white font-medium placeholder-gray-300 transition-colors resize-none" placeholder="Contoh: Saya butuh penawaran untuk 1 set Sondir 2.5 Ton dan CBR Lapangan..."></textarea>
+                        </div>
+
+                        <button type="submit" class="w-full bg-ijt-dark text-white font-bold text-lg py-4 border-2 border-transparent hover:bg-ijt-gold hover:text-ijt-dark hover:border-ijt-dark transition-all flex justify-center items-center gap-2 shadow-[4px_4px_0px_0px_#eee] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px]">
+                            <svg class="w-5 h-5" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.008-.57-.008-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
+                            Kirim ke WhatsApp
+                        </button>
+                    </form>
+                    <p class="mt-4 text-xs text-center text-gray-400">Data Anda aman. Kami akan membalas secepatnya pada jam kerja.</p>
+                </div>
+            </div>
+        </dialog>
+
+        <script define:vars={{ canonicalURL }}>
+            // ================= CONFIGURATION =================
+            const WA_NUMBER = "6281234567890"; // GANTI NOMOR WA ANDA DISINI (Format: 628xxx tanpa +)
+            // =================================================
+
+            // Elements
+            const modal = document.getElementById('rfq-modal');
+            const modalContent = modal.querySelector('.modal-content');
+            const btns = document.querySelectorAll('.btn-rfq'); // Semua tombol dengan class ini akan memicu modal
+            const closeBtn = document.getElementById('close-modal');
+            const form = document.getElementById('rfq-form');
+            const mobileMenuBtn = document.getElementById('menu-toggle');
+            const mobileMenu = document.getElementById('mobile-menu');
+
+            // 1. Logic Mobile Menu
+            if(mobileMenuBtn) {
+                mobileMenuBtn.addEventListener('click', () => {
+                    mobileMenu.classList.toggle('hidden');
+                });
+            }
+
+            // 2. Logic Modal Function
+            const openModal = () => {
+                modal.showModal();
+                modal.style.pointerEvents = 'auto'; // Re-enable events
+                // Animasi Masuk
+                setTimeout(() => {
+                    modalContent.classList.remove('scale-95', 'opacity-0');
+                    modalContent.classList.add('scale-100', 'opacity-100');
+                }, 10);
+            };
+
+            const closeModal = () => {
+                // Animasi Keluar
+                modalContent.classList.remove('scale-100', 'opacity-100');
+                modalContent.classList.add('scale-95', 'opacity-0');
+                setTimeout(() => {
+                    modal.close();
+                    modal.style.pointerEvents = 'none';
+                }, 300);
+            };
+
+            // Event Listeners Trigger
+            btns.forEach(btn => btn.addEventListener('click', (e) => {
+                e.preventDefault(); // Mencegah link default
+                openModal();
+            }));
+
+            closeBtn.addEventListener('click', closeModal);
+
+            // Close on backdrop click
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) closeModal();
+            });
+
+            // 3. Logic Form Submit & WA Formatting
+            form.addEventListener('submit', (e) => {
+                e.preventDefault();
+
+                const name = document.getElementById('rfq-name').value;
+                const city = document.getElementById('rfq-city').value || "-";
+                const org = document.getElementById('rfq-org').value;
+                const product = document.getElementById('rfq-product').value;
+                const sourceLink = window.location.href; // Mengambil URL halaman saat ini
+
+                // Format Pesan WhatsApp
+                const message = `Halo Indra Jaya Tektona, saya ingin minta penawaran.
+
+*DATA PEMESAN*
+Nama: ${name}
+Domisili: ${city}
+Instansi: ${org}
+
+*KEBUTUHAN PRODUK*
+${product}
+
+------------------------
+Source: ${sourceLink}`;
+
+                // Encode & Open WA
+                const encodedMessage = encodeURIComponent(message);
+                const waLink = `https://wa.me/${WA_NUMBER}?text=${encodedMessage}`;
+                
+                window.open(waLink, '_blank');
+                
+                // Opsional: Reset form setelah kirim
+                // form.reset();
+                // closeModal();
+            });
+        </script>
+	</body>
+</html>

@@ -1,16 +1,596 @@
 ---
+import Layout from '../layouts/Layout.astro';
 
+// ==========================================
+// 1. CONFIGURATION ZONE (ATUR DISINI)
+// ==========================================
+
+const CONFIG = {
+  // Kontak & Peta
+  mapsUrl: "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3966.052146208696!2d106.9242983!3d-6.2568633!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2e698d5f35555555%3A0x5555555555555555!2sJakarta!5e0!3m2!1sid!2sid!4v1234567890", // Ganti dengan Embed Link Google Maps Anda
+  addressDisplay: "Jl. Raya Mess AL, Jatisampurna, Bekasi, Jawa Barat",
+  
+  // SEO Meta
+  pageTitle: "Pusat Jual Alat Laboratorium Teknik Sipil Terlengkap (SNI/ASTM)",
+  metaDesc: "Distributor alat laboratorium teknik sipil, mekanika tanah, beton, aspal, batuan & mining equipment. Spesifikasi standar SNI, ASTM, AASHTO. Bergaransi & Terkalibrasi KAN.",
+  
+  // Statistik Trust Bar
+  stats: [
+    { label: "Tahun Pengalaman", value: "12+" },
+    { label: "Proyek Terlayani", value: "850+" },
+    { label: "Item Produk", value: "500+" },
+    { label: "Pengiriman", value: "Nasional" }
+  ]
+};
+
+// ==========================================
+// 2. DATA PRODUCTS & CLUSTERS
+// ==========================================
+
+// Custom SVG Icons (High Quality & Relevant)
+const icons = {
+  soil: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 20h20M12 2v6M4.93 4.93l2.83 2.83M19.07 4.93l-2.83 2.83M2 10h20M12 10v10M5 10l-3 3M19 10l3 3" /></svg>`, // Lapisan tanah
+  rock: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="9" /><path d="M8 12l2 2 4-4" /><circle cx="8" cy="8" r="1" fill="currentColor"/><circle cx="16" cy="16" r="1" fill="currentColor"/></svg>`, // Batuan/Agregat
+  concrete: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 21h18v-8a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v8z" /><path d="M12 11V3" /><path d="M8 3h8" /><path d="M7 15h10" /><path d="M7 18h10" /></svg>`, // Blok Beton & Press
+  asphalt: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 22h16a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2z" /><path d="M12 2v20" stroke-dasharray="4 4" /><path d="M2 12h20" stroke-opacity="0.2"/></svg>`, // Jalan Raya
+  cement: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M18 20V6a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v14" /><path d="M2 20h20" /><path d="M12 12v1" /><path d="M12 8v1" /><path d="M12 16v1" /></svg>`, // Silo Semen/Vicat
+  mining: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 7L13.73 17a3 3 0 0 1-5.06 0L2 8" /><path d="m12 12 2.6-3.8A2 2 0 0 1 18.2 8H22" /><path d="m9 11-1.6-2.9A2 2 0 0 0 5.8 7H2" /></svg>`, // Pickaxe
+  fluid: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 12h20" /><path d="M6 12c0-3.3 2.7-6 6-6s6 2.7 6 6" /><path d="M12 12v8" /><path d="M9 20h6" /></svg>`, // Hydraulics
+  general: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="3" width="20" height="14" rx="2" /><path d="M8 21h8" /><path d="M12 17v4" /></svg>`, // General Lab
+  check: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>`
+};
+
+const categories = [
+  { title: "Alat Lab Tanah", count: "38+ Alat", icon: icons.soil, slug: "/alat-lab-tanah", desc: "Sondir, CBR, Bor Tangan, Sand Cone, Direct Shear.", color: "bg-amber-50" },
+  { title: "Alat Lab Beton", count: "28+ Alat", icon: icons.concrete, slug: "/alat-lab-beton", desc: "Compression Machine, Hammer Test, Slump Test.", color: "bg-stone-50" },
+  { title: "Alat Lab Aspal", count: "19+ Alat", icon: icons.asphalt, slug: "/alat-lab-aspal", desc: "Marshall Test, Core Drill, Ekstraktor Aspal.", color: "bg-zinc-50" },
+  { title: "Alat Lab Batuan", count: "21+ Alat", icon: icons.rock, slug: "/alat-lab-batuan", desc: "Los Angeles Abrasion, Sieve Shaker, Impact Test.", color: "bg-orange-50" },
+  { title: "Alat Lab Semen", count: "5+ Alat", icon: icons.cement, slug: "/alat-lab-semen", desc: "Vicat Needle, Air Permeability Blaine.", color: "bg-gray-50" },
+  { title: "Mining Equipment", count: "13+ Alat", icon: icons.mining, slug: "/mining-equipment", desc: "Jaw Crusher, Pulverizer, Ball Mill, Oven.", color: "bg-slate-50" },
+  { title: "Hidrolika & Fluida", count: "8+ Alat", icon: icons.fluid, slug: "/hidrolika-fluida", desc: "Hydraulic Bench, Flume Test, Pipe Friction.", color: "bg-blue-50" },
+  { title: "General Equipment", count: "15+ Alat", icon: icons.general, slug: "/general-equipment", desc: "Oven Lab, Timbangan Digital, Glassware.", color: "bg-white" },
+];
+
+const faqs = [
+  { q: "Apakah alat laboratorium sudah terkalibrasi?", a: "Ya, kami menyediakan opsi kalibrasi KAN (Komite Akreditasi Nasional) untuk alat ukur presisi seperti Proving Ring, Load Cell, dan Timbangan. Sertifikat disertakan saat pengiriman." },
+  { q: "Apakah tersedia layanan purna jual (sparepart)?", a: "Tentu. Keunggulan Indra Jaya Tektona adalah ketersediaan sparepart jangka panjang. Kami tidak hanya jual putus, tapi menjamin maintenance alat Anda." },
+  { q: "Berapa lama garansi produk?", a: "Garansi standar kami adalah 1 tahun untuk kerusakan pabrik (manufacturing defect), tidak termasuk parts habis pakai (consumables)." },
+  { q: "Apakah bisa kirim ke luar pulau?", a: "Sangat bisa. Kami telah berpengalaman mengirim alat berat (seperti Mesin Tekan Beton) ke proyek di Papua, Kalimantan, hingga Aceh menggunakan ekspedisi kargo terpercaya." },
+  { q: "Bagaimana cara meminta penawaran harga (RAB)?", a: "Klik tombol 'Minta Penawaran' di pojok kanan atas atau tombol WA di bawah. Tim sales kami akan mengirimkan Quotation resmi dalam format PDF." },
+  { q: "Apakah alat memenuhi standar SNI/ASTM?", a: "Produk kami didesain mengacu pada standar SNI (Indonesia), ASTM (Amerika), dan AASHTO untuk memastikan data uji Anda valid secara teknis." },
+  { q: "Apakah menerima jasa service alat lama?", a: "Ya, kami menerima perbaikan dan rekondisi alat laboratorium lama Anda, seperti upgrade Mesin Tekan Beton manual menjadi Digital." },
+  { q: "Dimana lokasi workshop Indra Jaya Tektona?", a: "Workshop kami berlokasi di Bekasi. Anda dipersilakan berkunjung untuk melihat demo alat sebelum membeli." },
+];
+
+// ==========================================
+// 3. SCHEMA MARKUP GENERATOR
+// ==========================================
+const schemaData = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "LocalBusiness",
+      "@id": "https://indrajayatektona.com/#organization",
+      "name": "Indra Jaya Tektona",
+      "image": "https://indrajayatektona.com/logo.png",
+      "description": CONFIG.metaDesc,
+      "address": {
+        "@type": "PostalAddress",
+        "streetAddress": "Jl. Raya Mess AL",
+        "addressLocality": "Bekasi",
+        "addressRegion": "Jawa Barat",
+        "postalCode": "17433",
+        "addressCountry": "ID"
+      },
+      "geo": {
+        "@type": "GeoCoordinates",
+        "latitude": -6.3688,
+        "longitude": 106.9243
+      },
+      "url": "https://indrajayatektona.com",
+      "telephone": "+6281234567890",
+      "priceRange": "$$",
+      "aggregateRating": {
+        "@type": "AggregateRating",
+        "ratingValue": "4.8",
+        "reviewCount": "124",
+        "bestRating": "5",
+        "worstRating": "1"
+      }
+    },
+    {
+      "@type": "FAQPage",
+      "mainEntity": faqs.map(f => ({
+        "@type": "Question",
+        "name": f.q,
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": f.a
+        }
+      }))
+    },
+    {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "Home",
+          "item": "https://indrajayatektona.com"
+        }
+      ]
+    }
+  ]
+};
 ---
 
-<html lang="en">
-	<head>
-		<meta charset="utf-8" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<meta name="viewport" content="width=device-width" />
-		<meta name="generator" content={Astro.generator} />
-		<title>Astro</title>
-	</head>
-	<body>
-		<h1>Astro</h1>
-	</body>
-</html>
+<Layout title={CONFIG.pageTitle} description={CONFIG.metaDesc}>
+  
+  <script type="application/ld+json" set:html={JSON.stringify(schemaData)} slot="head" />
+
+  <main class="overflow-x-hidden">
+    
+    <section class="relative border-b-2 border-ijt-dark bg-ijt-base overflow-hidden">
+        <div class="absolute inset-0 z-0 opacity-10" style="background-image: url('data:image/svg+xml,%3Csvg width=\'60\' height=\'60\' viewBox=\'0 0 60 60\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cg fill=\'none\' fill-rule=\'evenodd\'%3E%3Cg fill=\'%231F2124\' fill-opacity=\'1\'%3E%3Cpath d=\'M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z\'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E');"></div>
+        
+        <div class="max-w-7xl mx-auto px-6 pt-16 pb-24 md:pt-32 md:pb-32 relative z-10">
+            <div class="grid lg:grid-cols-12 gap-12 items-center">
+                
+                <div class="lg:col-span-7 space-y-8 animate-fade-in-up">
+                    <div class="inline-flex items-center gap-3 px-4 py-2 bg-white border-2 border-ijt-dark shadow-[4px_4px_0px_0px_#C8A652] transform -rotate-1">
+                        <span class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
+                        <span class="font-mono text-xs font-black uppercase tracking-widest text-ijt-dark">Authorized Distributor</span>
+                    </div>
+
+                    <h1 class="text-5xl md:text-7xl font-black leading-[0.95] tracking-tight text-ijt-dark drop-shadow-sm">
+                        ALAT LAB <br>
+                        <span class="text-transparent bg-clip-text bg-gradient-to-r from-ijt-dark to-gray-600">TEKNIK SIPIL</span> <br>
+                        <span class="relative inline-block mt-2">
+                             TERLENGKAP.
+                            <span class="absolute -bottom-2 left-0 w-full h-4 bg-ijt-gold/30 -z-10 -rotate-1"></span>
+                        </span>
+                    </h1>
+
+                    <p class="text-lg md:text-xl text-gray-600 font-medium leading-relaxed max-w-xl border-l-4 border-ijt-gold pl-6">
+                        Mitra strategis kontraktor & konsultan untuk pengadaan alat uji <strong class="text-ijt-dark">Tanah, Beton, Aspal, & Batuan</strong>. Presisi data terjamin standar SNI, ASTM, & AASHTO.
+                    </p>
+
+                    <div class="flex flex-col sm:flex-row gap-5 pt-4">
+                        <a href="#kategori" class="bg-ijt-dark text-white px-8 py-4 font-bold text-lg border-2 border-transparent hover:bg-ijt-gold hover:text-ijt-dark hover:border-ijt-dark transition-all text-center shadow-[6px_6px_0px_0px_rgba(200,166,82,1)] hover:shadow-none hover:translate-x-[3px] hover:translate-y-[3px]">
+                            LIHAT KATALOG
+                        </a>
+                        <button class="btn-rfq bg-white text-ijt-dark px-8 py-4 font-bold text-lg border-2 border-ijt-dark hover:bg-gray-50 transition-all text-center flex items-center justify-center gap-3 shadow-[6px_6px_0px_0px_rgba(31,33,36,1)] hover:shadow-none hover:translate-x-[3px] hover:translate-y-[3px] cursor-pointer">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path></svg>
+                            KONSULTASI GRATIS
+                        </button>
+                    </div>
+
+                    <div class="pt-8 flex gap-8 items-center text-sm font-bold text-gray-500 font-mono">
+                        <div class="flex items-center gap-2">
+                            <svg class="w-5 h-5 text-ijt-gold" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path></svg>
+                            Ready Stock
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <svg class="w-5 h-5 text-ijt-gold" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path></svg>
+                            Garansi 1 Th
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <svg class="w-5 h-5 text-ijt-gold" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path></svg>
+                            Kalibrasi KAN
+                        </div>
+                    </div>
+                </div>
+
+                <div class="lg:col-span-5 relative hidden lg:block">
+                    <div class="absolute top-4 -right-4 w-full h-full border-2 border-ijt-dark bg-ijt-gold z-0"></div>
+                    <div class="relative z-10 bg-white border-2 border-ijt-dark p-2 shadow-2xl h-[500px] flex items-center justify-center overflow-hidden">
+                        <div class="text-center opacity-30">
+                            <div class="w-32 h-32 mx-auto mb-4 text-ijt-dark" set:html={icons.concrete}></div>
+                            <span class="font-black text-2xl">VISUAL ALAT</span>
+                         </div>
+                         <div class="absolute inset-0 bg-gradient-to-t from-white via-transparent to-transparent opacity-50"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div class="border-b-2 border-ijt-dark bg-ijt-dark text-white py-4 overflow-hidden relative">
+        <div class="marquee-container flex gap-12 whitespace-nowrap animate-marquee font-mono text-sm font-bold uppercase tracking-widest opacity-70">
+            <span>Trusted By:</span>
+            <span>WASKITA KARYA</span> • <span>PT. ADHI KARYA (PERSERO)</span> • <span>DINAS PU BINAMARGA</span> • <span>UNIVERSITAS GADJAH MADA</span> • <span>HUTAMA KARYA</span> • <span>PT. PP (PEMBANGUNAN PERUMAHAN)</span> • <span>LAB TEKNIK SIPIL UI</span> • <span>WIJAYA KARYA</span>
+             <span>WASKITA KARYA</span> • <span>PT. ADHI KARYA (PERSERO)</span> • <span>DINAS PU BINAMARGA</span> • <span>UNIVERSITAS GADJAH MADA</span> • <span>HUTAMA KARYA</span> • <span>PT. PP (PEMBANGUNAN PERUMAHAN)</span> • <span>LAB TEKNIK SIPIL UI</span> • <span>WIJAYA KARYA</span>
+        </div>
+    </div>
+
+    <section class="bg-white border-b-2 border-ijt-dark py-12">
+        <div class="max-w-7xl mx-auto px-6 grid grid-cols-2 md:grid-cols-4 gap-8 text-center divide-x-2 divide-gray-100">
+            {CONFIG.stats.map(stat => (
+                <div class="space-y-1 group hover:-translate-y-1 transition-transform cursor-default">
+                    <p class="text-4xl md:text-5xl font-black text-ijt-dark group-hover:text-ijt-gold transition-colors">{stat.value}</p>
+                    <p class="text-xs font-bold uppercase tracking-widest text-gray-400">{stat.label}</p>
+                </div>
+            ))}
+        </div>
+    </section>
+
+    <section id="kategori" class="py-24 bg-ijt-base relative">
+        <div class="absolute top-0 right-0 w-64 h-64 bg-ijt-gold/10 rounded-full blur-3xl -z-0"></div>
+
+        <div class="max-w-7xl mx-auto px-6 relative z-10">
+            <div class="flex flex-col md:flex-row justify-between items-end mb-16 gap-6">
+                <div>
+                    <h2 class="text-4xl md:text-5xl font-black uppercase text-ijt-dark mb-4">Kategori Produk</h2>
+                    <div class="h-2 w-24 bg-ijt-gold"></div>
+                    <p class="mt-4 text-gray-600 font-medium max-w-2xl">
+                        Navigasi cepat ke 8 kluster peralatan pengujian utama. Didesain untuk kemudahan pencarian spesifikasi teknis.
+                    </p>
+                </div>
+                <a href="/produk" class="font-bold text-ijt-dark border-b-2 border-ijt-dark hover:text-ijt-gold hover:border-ijt-gold transition-all pb-1">Lihat Semua Produk →</a>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                {categories.map((cat) => (
+                    <a href={cat.slug} class={`group relative block ${cat.color} border-2 border-ijt-dark p-6 transition-all duration-300 hover:-translate-y-2 shadow-[4px_4px_0px_0px_rgba(31,33,36,0.1)] hover:shadow-[8px_8px_0px_0px_#C8A652]`}>
+                        <div class="flex justify-between items-start mb-6">
+                            <div class="w-14 h-14 text-ijt-dark group-hover:text-ijt-gold transition-colors duration-300" set:html={cat.icon} />
+                            <span class="text-[10px] font-black bg-white border border-ijt-dark px-2 py-1 uppercase tracking-wide">{cat.count}</span>
+                        </div>
+                        <h3 class="text-xl font-black uppercase mb-3 leading-none group-hover:underline decoration-2 underline-offset-4">{cat.title}</h3>
+                        <p class="text-sm text-gray-500 font-medium leading-relaxed mb-4 min-h-[40px]">{cat.desc}</p>
+                        
+                        <div class="w-full py-2 bg-white border border-ijt-dark text-center text-xs font-bold uppercase tracking-wider group-hover:bg-ijt-dark group-hover:text-white transition-colors">
+                            Lihat Detail
+                        </div>
+                    </a>
+                ))}
+            </div>
+        </div>
+    </section>
+
+	<section class="py-24 bg-white border-b-2 border-ijt-dark">
+    <div class="max-w-7xl mx-auto px-6">
+        <div class="flex flex-col md:flex-row justify-between items-end mb-12">
+            <div>
+                <span class="font-mono text-xs font-bold text-ijt-gold uppercase tracking-widest">Pilihan Kontraktor</span>
+                <h2 class="text-4xl font-black text-ijt-dark mt-2 uppercase">Produk Unggulan Bulan Ini</h2>
+            </div>
+            <div class="hidden md:flex gap-2">
+                <span class="px-4 py-2 bg-ijt-dark text-white text-xs font-bold uppercase border-2 border-ijt-dark cursor-pointer">All Items</span>
+                <span class="px-4 py-2 bg-white text-gray-500 text-xs font-bold uppercase border-2 border-gray-200 hover:border-ijt-dark hover:text-ijt-dark cursor-pointer transition-all">Tanah</span>
+                <span class="px-4 py-2 bg-white text-gray-500 text-xs font-bold uppercase border-2 border-gray-200 hover:border-ijt-dark hover:text-ijt-dark cursor-pointer transition-all">Beton</span>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+            
+            <div class="group border-2 border-ijt-dark bg-white hover:-translate-y-2 transition-transform duration-300">
+                <div class="relative bg-gray-100 aspect-square border-b-2 border-ijt-dark overflow-hidden">
+                    <span class="absolute top-4 left-4 z-10 bg-ijt-gold text-ijt-dark text-[10px] font-black uppercase px-2 py-1 border border-ijt-dark">Best Seller</span>
+                    <img src="https://placehold.co/600x600/F8F9FA/1F2124?text=Sondir+5+Ton" alt="Sondir 5 Ton Hydraulic" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 mix-blend-multiply">
+                </div>
+                <div class="p-6">
+                    <h3 class="text-lg font-black uppercase leading-tight mb-2 group-hover:text-ijt-gold transition-colors">Sondir Hydraulic 5 Ton</h3>
+                    <p class="text-xs text-gray-500 font-mono mb-4">SKU: IJT-SOIL-001</p>
+                    <ul class="text-sm text-gray-600 space-y-2 mb-6 border-t border-dashed border-gray-300 pt-4">
+                        <li class="flex justify-between"><span>Kap:</span> <strong class="text-ijt-dark">50 kN</strong></li>
+                        <li class="flex justify-between"><span>Engine:</span> <strong class="text-ijt-dark">Honda 5.5 HP</strong></li>
+                        <li class="flex justify-between"><span>Standar:</span> <strong class="text-ijt-dark">SNI 2827:2008</strong></li>
+                    </ul>
+                    <button class="btn-rfq w-full py-3 bg-ijt-dark text-white font-bold text-sm uppercase hover:bg-ijt-gold hover:text-ijt-dark transition-colors border-2 border-transparent hover:border-ijt-dark">
+                        Minta Harga
+                    </button>
+                </div>
+            </div>
+
+            <div class="group border-2 border-ijt-dark bg-white hover:-translate-y-2 transition-transform duration-300">
+                <div class="relative bg-gray-100 aspect-square border-b-2 border-ijt-dark overflow-hidden">
+                    <span class="absolute top-4 left-4 z-10 bg-black text-white text-[10px] font-black uppercase px-2 py-1">Ready Stock</span>
+                    <img src="https://placehold.co/600x600/F8F9FA/1F2124?text=Mesin+Tekan+Beton" alt="Compression Machine 2000 kN" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 mix-blend-multiply">
+                </div>
+                <div class="p-6">
+                    <h3 class="text-lg font-black uppercase leading-tight mb-2 group-hover:text-ijt-gold transition-colors">Compression Machine 2000 kN</h3>
+                    <p class="text-xs text-gray-500 font-mono mb-4">SKU: IJT-CONC-045</p>
+                    <ul class="text-sm text-gray-600 space-y-2 mb-6 border-t border-dashed border-gray-300 pt-4">
+                        <li class="flex justify-between"><span>Tipe:</span> <strong class="text-ijt-dark">Digital Readout</strong></li>
+                        <li class="flex justify-between"><span>Frame:</span> <strong class="text-ijt-dark">Heavy Duty Steel</strong></li>
+                        <li class="flex justify-between"><span>Akurasi:</span> <strong class="text-ijt-dark">Grade A (1%)</strong></li>
+                    </ul>
+                    <button class="btn-rfq w-full py-3 bg-ijt-dark text-white font-bold text-sm uppercase hover:bg-ijt-gold hover:text-ijt-dark transition-colors border-2 border-transparent hover:border-ijt-dark">
+                        Minta Harga
+                    </button>
+                </div>
+            </div>
+
+            <div class="group border-2 border-ijt-dark bg-white hover:-translate-y-2 transition-transform duration-300">
+                <div class="relative bg-gray-100 aspect-square border-b-2 border-ijt-dark overflow-hidden">
+                    <img src="https://placehold.co/600x600/F8F9FA/1F2124?text=Marshall+Test+Set" alt="Marshall Test Set" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 mix-blend-multiply">
+                </div>
+                <div class="p-6">
+                    <h3 class="text-lg font-black uppercase leading-tight mb-2 group-hover:text-ijt-gold transition-colors">Marshall Test Set Complete</h3>
+                    <p class="text-xs text-gray-500 font-mono mb-4">SKU: IJT-ASP-102</p>
+                    <ul class="text-sm text-gray-600 space-y-2 mb-6 border-t border-dashed border-gray-300 pt-4">
+                        <li class="flex justify-between"><span>Proving Ring:</span> <strong class="text-ijt-dark">6.000 lbs</strong></li>
+                        <li class="flex justify-between"><span>Mold:</span> <strong class="text-ijt-dark">3 Pcs Included</strong></li>
+                        <li class="flex justify-between"><span>Power:</span> <strong class="text-ijt-dark">220V / 50Hz</strong></li>
+                    </ul>
+                    <button class="btn-rfq w-full py-3 bg-ijt-dark text-white font-bold text-sm uppercase hover:bg-ijt-gold hover:text-ijt-dark transition-colors border-2 border-transparent hover:border-ijt-dark">
+                        Minta Harga
+                    </button>
+                </div>
+            </div>
+
+            <div class="group border-2 border-ijt-dark bg-white hover:-translate-y-2 transition-transform duration-300">
+                <div class="relative bg-gray-100 aspect-square border-b-2 border-ijt-dark overflow-hidden">
+                    <span class="absolute top-4 left-4 z-10 bg-ijt-dark text-white text-[10px] font-black uppercase px-2 py-1 border border-white">Mining</span>
+                    <img src="https://placehold.co/600x600/F8F9FA/1F2124?text=Jaw+Crusher+Lab" alt="Laboratory Jaw Crusher" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 mix-blend-multiply">
+                </div>
+                <div class="p-6">
+                    <h3 class="text-lg font-black uppercase leading-tight mb-2 group-hover:text-ijt-gold transition-colors">Laboratory Jaw Crusher</h3>
+                    <p class="text-xs text-gray-500 font-mono mb-4">SKU: IJT-MINE-008</p>
+                    <ul class="text-sm text-gray-600 space-y-2 mb-6 border-t border-dashed border-gray-300 pt-4">
+                        <li class="flex justify-between"><span>Jaw:</span> <strong class="text-ijt-dark">5" x 8"</strong></li>
+                        <li class="flex justify-between"><span>Output:</span> <strong class="text-ijt-dark">Adjustable</strong></li>
+                        <li class="flex justify-between"><span>Capacity:</span> <strong class="text-ijt-dark">High Throughput</strong></li>
+                    </ul>
+                    <button class="btn-rfq w-full py-3 bg-ijt-dark text-white font-bold text-sm uppercase hover:bg-ijt-gold hover:text-ijt-dark transition-colors border-2 border-transparent hover:border-ijt-dark">
+                        Minta Harga
+                    </button>
+                </div>
+            </div>
+
+        </div>
+        
+        <div class="mt-12 text-center">
+            <a href="/produk" class="inline-block border-b-2 border-ijt-dark pb-1 font-bold hover:text-ijt-gold hover:border-ijt-gold transition-colors">Lihat Katalog Lengkap (500+ SKU) →</a>
+        </div>
+    </div>
+</section>
+
+    <section class="bg-ijt-dark text-white py-24 border-y-2 border-white/10">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="grid md:grid-cols-3 gap-12">
+                <div class="space-y-4">
+                    <div class="w-12 h-12 bg-ijt-gold text-ijt-dark flex items-center justify-center border-2 border-white shadow-[4px_4px_0px_0px_#fff]">
+                        <span class="text-2xl font-black">01</span>
+                    </div>
+                    <h3 class="text-2xl font-bold">Akurasi Tanpa Kompromi</h3>
+                    <p class="text-gray-400 leading-relaxed">
+                        Kami paham bahwa 0.1% kesalahan data lab bisa fatal bagi struktur. Semua alat kami melewati QC ketat dan bisa dikalibrasi KAN.
+                    </p>
+                </div>
+                <div class="space-y-4">
+                    <div class="w-12 h-12 bg-ijt-base text-ijt-dark flex items-center justify-center border-2 border-white shadow-[4px_4px_0px_0px_#fff]">
+                        <span class="text-2xl font-black">02</span>
+                    </div>
+                    <h3 class="text-2xl font-bold">Layanan Purna Jual</h3>
+                    <p class="text-gray-400 leading-relaxed">
+                        Takut beli alat lalu rusak tidak ada sparepart? Kami menjamin ketersediaan suku cadang dan teknisi ahli untuk perbaikan.
+                    </p>
+                </div>
+                <div class="space-y-4">
+                    <div class="w-12 h-12 bg-ijt-base text-ijt-dark flex items-center justify-center border-2 border-white shadow-[4px_4px_0px_0px_#fff]">
+                        <span class="text-2xl font-black">03</span>
+                    </div>
+                    <h3 class="text-2xl font-bold">Pengiriman Aman</h3>
+                    <p class="text-gray-400 leading-relaxed">
+                        Packing kayu standar ekspor. Asuransi pengiriman penuh. Kami pastikan alat sampai ke site proyek Anda dalam kondisi presisi.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+<section class="py-24 bg-white">
+    <div class="max-w-5xl mx-auto px-6">
+        <div class="mb-12 text-center">
+            <span class="font-mono text-xs font-bold text-ijt-gold uppercase tracking-widest">Technical Insight</span>
+            <h2 class="text-3xl md:text-5xl font-black text-ijt-dark mt-2 uppercase">Ensiklopedia Alat Teknik Sipil</h2>
+        </div>
+
+        <article class="bg-white p-8 md:p-12 border-2 border-ijt-dark shadow-[12px_12px_0px_0px_#F8F9FA]">
+            <h3 class="text-2xl font-black text-ijt-dark mb-6 border-l-8 border-ijt-gold pl-4 uppercase">
+                Panduan Memilih Alat Uji Tanah: Sondir vs Boring
+            </h3>
+            
+            <p class="text-gray-700 leading-relaxed mb-6">
+                Dalam penyelidikan tanah (Soil Investigation), sering terjadi kebingungan dalam memilih metode yang tepat. Sebagai distributor alat laboratorium teknik sipil, kami merangkum perbedaannya dalam tabel berikut untuk membantu Anda menentukan RAB:
+            </p>
+
+            <div class="overflow-x-auto mb-10">
+                <table class="w-full text-left border-collapse border-2 border-ijt-dark">
+                    <thead>
+                        <tr class="bg-ijt-dark text-white">
+                            <th class="p-4 border border-gray-600 font-bold uppercase text-sm">Parameter</th>
+                            <th class="p-4 border border-gray-600 font-bold uppercase text-sm w-1/3">Sondir (CPT)</th>
+                            <th class="p-4 border border-gray-600 font-bold uppercase text-sm w-1/3">Standard Penetration Test (SPT)</th>
+                        </tr>
+                    </thead>
+                    <tbody class="text-sm md:text-base">
+                        <tr class="hover:bg-yellow-50">
+                            <td class="p-4 border-2 border-gray-200 font-bold text-ijt-dark">Output Data</td>
+                            <td class="p-4 border-2 border-gray-200">Tahanan Konus (qc) & Hambatan Lekat</td>
+                            <td class="p-4 border-2 border-gray-200">Nilai N-SPT & Sampel Tanah Asli</td>
+                        </tr>
+                        <tr class="hover:bg-yellow-50">
+                            <td class="p-4 border-2 border-gray-200 font-bold text-ijt-dark">Jenis Tanah</td>
+                            <td class="p-4 border-2 border-gray-200">Efektif di tanah lunak - sedang (Lempung)</td>
+                            <td class="p-4 border-2 border-gray-200">Bisa menembus tanah keras & berbatu</td>
+                        </tr>
+                        <tr class="hover:bg-yellow-50">
+                            <td class="p-4 border-2 border-gray-200 font-bold text-ijt-dark">Biaya</td>
+                            <td class="p-4 border-2 border-gray-200"><span class="bg-green-100 text-green-800 px-2 py-1 font-bold text-xs rounded">Lebih Ekonomis</span></td>
+                            <td class="p-4 border-2 border-gray-200">Relatif Mahal (Butuh Mesin Bor)</td>
+                        </tr>
+                        <tr class="hover:bg-yellow-50">
+                            <td class="p-4 border-2 border-gray-200 font-bold text-ijt-dark">Standar Alat</td>
+                            <td class="p-4 border-2 border-gray-200">ASTM D3441 / SNI 2827:2008</td>
+                            <td class="p-4 border-2 border-gray-200">ASTM D1586 / SNI 4153:2008</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <h3 class="text-xl font-black text-ijt-dark mb-4 mt-8">Prosedur Kalibrasi Alat Laboratorium (Wajib Tahu)</h3>
+            <p class="text-gray-700 mb-4">Agar hasil uji valid secara hukum, alat seperti <a href="/alat-lab-beton" class="text-ijt-gold font-bold hover:underline">Compression Machine</a> harus dikalibrasi berkala. Berikut alurnya:</p>
+            
+            <ol class="list-decimal list-outside ml-6 space-y-3 text-gray-700 mb-10 font-medium">
+                <li class="pl-2">
+                    <span class="font-bold text-ijt-dark">Pemeriksaan Fisik:</span> 
+                    Teknisi mengecek kebocoran oli hidrolik, kerataan plat tekan, dan fungsi manometer.
+                </li>
+                <li class="pl-2">
+                    <span class="font-bold text-ijt-dark">Uji Beban (Load Test):</span> 
+                    Menggunakan <em>Proving Ring</em> atau <em>Load Cell</em> yang tertelusur ke standar nasional (KAN).
+                </li>
+                <li class="pl-2">
+                    <span class="font-bold text-ijt-dark">Analisa Deviasi:</span> 
+                    Membandingkan pembacaan mesin dengan alat standar. Toleransi error maksimal biasanya ±1%.
+                </li>
+                <li class="pl-2">
+                    <span class="font-bold text-ijt-dark">Penerbitan Sertifikat:</span> 
+                    Jika lolos, sertifikat KAN diterbitkan dengan masa berlaku 1 tahun.
+                </li>
+            </ol>
+
+            <div class="bg-gray-50 p-6 border border-gray-200">
+                <h3 class="text-lg font-black text-ijt-dark mb-4 uppercase">Daftar Standar Acuan Produk Kami</h3>
+                <ul class="grid md:grid-cols-2 gap-3">
+                    <li class="flex items-center gap-3 text-sm text-gray-700">
+                        <div class="w-2 h-2 bg-ijt-gold rounded-full"></div> 
+                        <span><strong>SNI 1965:2008</strong> (Cara Uji Kadar Air)</span>
+                    </li>
+                    <li class="flex items-center gap-3 text-sm text-gray-700">
+                        <div class="w-2 h-2 bg-ijt-gold rounded-full"></div> 
+                        <span><strong>SNI 1974:2011</strong> (Kuat Tekan Beton)</span>
+                    </li>
+                    <li class="flex items-center gap-3 text-sm text-gray-700">
+                        <div class="w-2 h-2 bg-ijt-gold rounded-full"></div> 
+                        <span><strong>ASTM D-1559</strong> (Marshall Test Aspal)</span>
+                    </li>
+                    <li class="flex items-center gap-3 text-sm text-gray-700">
+                        <div class="w-2 h-2 bg-ijt-gold rounded-full"></div> 
+                        <span><strong>AASHTO T-99</strong> (Compaction Test)</span>
+                    </li>
+                </ul>
+            </div>
+            
+            <div class="mt-8 text-center">
+                 <button class="btn-rfq inline-flex items-center gap-2 font-bold text-ijt-dark border-b-2 border-ijt-dark hover:text-ijt-gold hover:border-ijt-gold transition-colors pb-1 cursor-pointer">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                    Download Brosur Spesifikasi PDF
+                </button>
+            </div>
+
+        </article>
+    </div>
+</section>
+
+    <section class="py-20 bg-ijt-base border-t-2 border-ijt-dark">
+        <div class="max-w-4xl mx-auto px-6">
+            <h2 class="text-4xl font-black text-center mb-12 uppercase text-ijt-dark">Pertanyaan Umum (FAQ)</h2>
+            
+            <div class="space-y-4">
+                {faqs.map((faq, index) => (
+                    <details class="group bg-white border-2 border-ijt-dark open:shadow-[8px_8px_0px_0px_#C8A652] transition-all duration-300">
+                        <summary class="flex justify-between items-center font-bold cursor-pointer list-none p-6 text-lg hover:bg-gray-50 transition-colors">
+                            <span>{faq.q}</span>
+                            <span class="transition group-open:rotate-180">
+                                <svg fill="none" height="24" shape-rendering="geometricPrecision" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" viewBox="0 0 24 24" width="24"><path d="M6 9l6 6 6-6"></path></svg>
+                            </span>
+                        </summary>
+                        <div class="text-gray-600 p-6 pt-0 leading-relaxed border-t-2 border-transparent group-open:border-gray-100 animate-fade-in">
+                            {faq.a}
+                        </div>
+                    </details>
+                ))}
+            </div>
+        </div>
+    </section>
+
+    <section class="bg-white border-y-2 border-ijt-dark relative">
+        <div class="grid md:grid-cols-2 h-[500px]">
+            <div class="p-12 bg-ijt-dark text-white flex flex-col justify-center">
+                <span class="text-ijt-gold font-mono text-sm font-bold uppercase tracking-widest mb-4">Kunjungi Kami</span>
+                <h2 class="text-4xl font-black mb-6">WORKSHOP & OFFICE</h2>
+                <p class="text-gray-300 mb-8 leading-relaxed text-lg">
+                    Lihat langsung demo alat, konsultasi dengan teknisi, dan cek fisik barang sebelum membeli.
+                </p>
+                <div class="space-y-4 font-medium">
+                    <div class="flex items-start gap-4">
+                        <div class="w-6 h-6 text-ijt-gold mt-1" set:html={icons.general} /> <p>{CONFIG.addressDisplay}</p>
+                    </div>
+                    <div class="flex items-center gap-4">
+                        <svg class="w-6 h-6 text-ijt-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        <p>Senin - Jumat (08:00 - 17:00)</p>
+                    </div>
+                </div>
+                <a href="https://maps.google.com" target="_blank" class="mt-8 inline-block w-max border-b-2 border-ijt-gold pb-1 text-ijt-gold font-bold hover:text-white transition-colors">Buka di Google Maps →</a>
+            </div>
+
+            <div class="h-full w-full bg-gray-200 relative">
+                 <iframe 
+                    src={CONFIG.mapsUrl}
+                    width="100%" 
+                    height="100%" 
+                    style="border:0;" 
+                    allowfullscreen="" 
+                    loading="lazy" 
+                    referrerpolicy="no-referrer-when-downgrade"
+                    class="absolute inset-0 grayscale hover:grayscale-0 transition-all duration-500"
+                ></iframe>
+            </div>
+        </div>
+    </section>
+
+    <section class="bg-ijt-base py-24 text-center">
+        <div class="max-w-3xl mx-auto px-6">
+            <h2 class="text-4xl md:text-5xl font-black text-ijt-dark mb-6">BUTUH KATALOG PDF LENGKAP?</h2>
+            <p class="text-xl text-gray-600 mb-10">
+                Dapatkan daftar spesifikasi teknis lengkap untuk 500+ item alat lab teknik sipil dalam satu file PDF. Cocok untuk referensi penyusunan RAB.
+            </p>
+            <div class="flex flex-col sm:flex-row justify-center gap-6">
+                 <button class="btn-rfq bg-ijt-gold text-ijt-dark px-10 py-5 font-black text-xl border-4 border-ijt-dark hover:bg-white transition-all shadow-[8px_8px_0px_0px_rgba(31,33,36,1)] hover:shadow-none hover:translate-x-[4px] hover:translate-y-[4px] cursor-pointer">
+                    DOWNLOAD KATALOG 2026
+                </button>
+            </div>
+            <p class="mt-6 text-sm text-gray-400 font-mono">Gratis. Tanpa syarat ribet.</p>
+        </div>
+    </section>
+
+  </main>
+</Layout>
+
+<style>
+    /* Marquee Animation */
+    @keyframes marquee {
+        0% { transform: translateX(0); }
+        100% { transform: translateX(-50%); }
+    }
+    .animate-marquee {
+        animation: marquee 30s linear infinite;
+    }
+    
+    /* Fade In Up Utility */
+    @keyframes fadeInUp {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    .animate-fade-in-up {
+        animation: fadeInUp 0.8s ease-out forwards;
+    }
+    
+    /* Fade In */
+    @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
+    .animate-fade-in {
+        animation: fadeIn 0.3s ease-out forwards;
+    }
+
+    /* Custom Scrollbar for Map/Content if needed */
+    .scrollbar-hide::-webkit-scrollbar {
+        display: none;
+    }
+</style>
