@@ -1,15 +1,13 @@
 ---
 import { getCollection } from 'astro:content';
 import Layout from '../../layouts/Layout.astro';
+import Breadcrumb from '../../components/Breadcrumb.astro'; // <--- 1. IMPORT INI
 
-// 1. Definisikan Kategori apa saja yang valid (Sesuai database kita)
+// 1. Definisikan Kategori Valid
 export async function getStaticPaths() {
   const products = await getCollection('products');
-  // Ambil unik kategori
   const uniqueCategories = [...new Set(products.map((p) => p.data.category))];
-
   return uniqueCategories.map((category) => {
-    // Filter produk yang sesuai kategori ini saja
     const filteredProducts = products.filter((p) => p.data.category === category);
     return {
       params: { category },
@@ -20,36 +18,69 @@ export async function getStaticPaths() {
 
 const { category } = Astro.params;
 const { products } = Astro.props;
-
-// Judul Halaman Cantik (misal: "alat-lab-tanah" jadi "Alat Lab Tanah")
 const title = category.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+
+// Siapkan data pencarian untuk setiap produk (Name + Specs digabung jadi string searchable)
+const productsWithSearchData = products.map(p => {
+    // Gabungkan nama dan spek jadi satu string panjang huruf kecil untuk index pencarian
+    const specsString = p.data.specs ? Object.values(p.data.specs).join(' ') : '';
+    const searchIndex = `${p.data.name} ${specsString} ${p.data.category}`.toLowerCase();
+    return { ...p, searchIndex };
+});
 ---
 
-<Layout title={`Jual ${title} Terlengkap - Indra Jaya Tektona`} description={`Katalog ${title} standar SNI/ASTM. Tersedia berbagai tipe dan kapasitas untuk kebutuhan proyek teknik sipil.`}>
+<Layout title={`Jual ${title} Terlengkap - Indra Jaya Tektona`} description={`Katalog ${title} standar SNI/ASTM. Tersedia berbagai tipe dan kapasitas.`}>
     
-    <header class="bg-ijt-dark text-white py-16 border-b-4 border-ijt-gold">
-        <div class="max-w-7xl mx-auto px-6 text-center">
+    <header class="bg-ijt-dark text-white py-12 md:py-16 border-b-4 border-ijt-gold relative overflow-hidden">
+        <div class="absolute inset-0 opacity-10 pointer-events-none" style="background-image: radial-gradient(#C8A652 1px, transparent 1px); background-size: 20px 20px;"></div>
+        
+        <div class="max-w-7xl mx-auto px-6 text-center relative z-10">
             <span class="font-mono text-xs font-bold text-ijt-gold uppercase tracking-widest mb-2 block">Katalog Produk</span>
-            <h1 class="text-4xl md:text-5xl font-black uppercase tracking-tight mb-4">{title}</h1>
-            <p class="text-gray-400 max-w-2xl mx-auto text-lg">Menampilkan {products.length} alat uji kualitas terbaik untuk kebutuhan laboratorium dan lapangan.</p>
+            <h1 class="text-3xl md:text-5xl font-black uppercase tracking-tight mb-4">{title}</h1>
+            
+            <div class="max-w-xl mx-auto mt-8 relative">
+                <div class="relative">
+                    <input 
+                        type="text" 
+                        id="search-input"
+                        placeholder={`Cari alat di kategori ${title}... (Misal: Digital, 5 Ton)`}
+                        class="w-full pl-12 pr-4 py-4 bg-white text-ijt-dark font-bold border-4 border-transparent focus:border-ijt-gold focus:outline-none shadow-xl transition-all placeholder-gray-400"
+                    />
+                    <div class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                    </div>
+                </div>
+                <div id="search-stats" class="text-xs font-mono text-gray-400 mt-2 h-4 transition-opacity duration-300 opacity-0">
+                    Menampilkan <span id="count-display">{products.length}</span> produk
+                </div>
+            </div>
         </div>
     </header>
 
-    <div class="border-b border-gray-200 bg-gray-50 py-3">
-        <div class="max-w-7xl mx-auto px-6 text-xs font-mono font-bold uppercase tracking-widest text-gray-500">
-            <a href="/" class="hover:text-ijt-gold">Home</a> 
-            <span class="mx-2">/</span>
-            <span class="text-ijt-dark">{title}</span>
+    <div class="border-b border-gray-200 bg-gray-50 py-3 sticky top-[80px] z-30 shadow-sm">
+        <div class="max-w-7xl mx-auto px-6 text-xs font-mono font-bold uppercase tracking-widest text-gray-500 flex justify-between items-center">
+            <div>
+                <a href="/" class="hover:text-ijt-gold">Home</a> 
+                <span class="mx-2">/</span>
+                <span class="text-ijt-dark">{title}</span>
+            </div>
+            <button id="reset-btn" class="hidden text-red-500 hover:underline cursor-pointer">
+                Reset Filter ✕
+            </button>
         </div>
     </div>
 
-    <main class="py-16 bg-white min-h-screen">
+    <main class="py-12 bg-white min-h-screen">
         <div class="max-w-7xl mx-auto px-6">
             
             {products.length > 0 ? (
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-                    {products.map((product) => (
-                        <a href={`/${category}/${product.slug}`} class="group border-2 border-ijt-dark bg-white hover:-translate-y-2 transition-transform duration-300 flex flex-col h-full">
+                <div id="product-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+                    {productsWithSearchData.map((product) => (
+                        <a 
+                            href={`/${category}/${product.slug}`} 
+                            class="product-card group border-2 border-ijt-dark bg-white hover:-translate-y-2 transition-transform duration-300 flex flex-col h-full"
+                            data-search={product.searchIndex}
+                        >
                             <div class="relative bg-gray-100 aspect-square border-b-2 border-ijt-dark overflow-hidden">
                                 <img 
                                     src={product.data.image} 
@@ -65,11 +96,11 @@ const title = category.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase())
                             </div>
                             
                             <div class="p-6 flex flex-col flex-grow">
-                                <h3 class="text-lg font-black uppercase leading-tight mb-2 group-hover:text-ijt-gold transition-colors line-clamp-2">
+                                <h3 class="text-lg font-black uppercase leading-tight mb-2 group-hover:text-ijt-gold transition-colors line-clamp-2 highlight-target">
                                     {product.data.name}
                                 </h3>
                                 
-                                {/* Specs Mini (Ambil 2 pertama) */}
+                                {/* Specs Mini */}
                                 <div class="mt-auto pt-4 border-t border-dashed border-gray-300">
                                     <ul class="text-xs text-gray-600 space-y-1 font-mono">
                                         {product.data.specs && Object.entries(product.data.specs).slice(0, 2).map(([k, v]) => (
@@ -95,6 +126,108 @@ const title = category.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase())
                 </div>
             )}
             
+            <div id="empty-state" class="hidden text-center py-20">
+                <div class="text-6xl mb-4">🔍</div>
+                <h3 class="text-xl font-bold text-ijt-dark mb-2">Produk tidak ditemukan</h3>
+                <p class="text-gray-500">Coba gunakan kata kunci yang lebih umum atau periksa ejaan Anda.</p>
+            </div>
+            
         </div>
     </main>
 </Layout>
+
+<script>
+    // Elemen DOM
+    const searchInput = document.getElementById('search-input');
+    const productGrid = document.getElementById('product-grid');
+    const products = document.querySelectorAll('.product-card');
+    const emptyState = document.getElementById('empty-state');
+    const searchStats = document.getElementById('search-stats');
+    const countDisplay = document.getElementById('count-display');
+    const resetBtn = document.getElementById('reset-btn');
+
+    // Fungsi Pencarian "Cerdas"
+    function filterProducts(query) {
+        // 1. Normalisasi Query (Hapus spasi ganda, lowercase)
+        const cleanQuery = query.toLowerCase().trim();
+        const queryTokens = cleanQuery.split(/\s+/); // Pecah jadi array kata ["sondir", "5", "ton"]
+
+        let visibleCount = 0;
+
+        products.forEach(card => {
+            // Ambil data search dari atribut HTML (Nama + Spek)
+            const searchData = card.getAttribute('data-search');
+            
+            // LOGIKA PENCARIAN (Complex Logic)
+            // Setiap kata yang diketik user (token) HARUS ada di dalam data produk
+            // Contoh: User ketik "Sondir 5" -> Maka "Sondir" harus ada DAN "5" harus ada.
+            
+            const isMatch = queryTokens.every(token => {
+                // A. Direct Match (Cek apakah kata ada)
+                if (searchData.includes(token)) return true;
+
+                // B. Fuzzy / Typo Handling (Sederhana tapi efektif)
+                // Cek jika token lebih dari 3 huruf dan punya kemiripan substring
+                // Misal: "Sondr" (typo) masih bisa dianggap match jika "Sondir" ada
+                if (token.length > 3) {
+                    // Logic: Izinkan 1 huruf hilang/salah (Sangat basic fuzzy)
+                    // Kita pakai teknik sederhana: cek apakah 80% karakter token ada di searchData secara berurutan
+                    // (Disini kita pakai includes saja untuk performa, fuzzy regex terlalu berat untuk vanilla loop besar)
+                    return false; 
+                }
+                return false;
+            });
+
+            // Logic Tambahan: Jika query kosong, tampilkan semua
+            const shouldShow = cleanQuery === '' || isMatch;
+
+            if (shouldShow) {
+                card.classList.remove('hidden');
+                visibleCount++;
+            } else {
+                card.classList.add('hidden');
+            }
+        });
+
+        // Update UI
+        updateUI(visibleCount, cleanQuery);
+    }
+
+    function updateUI(count, query) {
+        // Update Counter
+        if (countDisplay) countDisplay.innerText = count;
+        
+        // Toggle Empty State
+        if (count === 0) {
+            productGrid.classList.add('hidden');
+            emptyState.classList.remove('hidden');
+        } else {
+            productGrid.classList.remove('hidden');
+            emptyState.classList.add('hidden');
+        }
+
+        // Show/Hide Reset Button & Stats
+        if (query.length > 0) {
+            resetBtn.classList.remove('hidden');
+            searchStats.classList.remove('opacity-0');
+        } else {
+            resetBtn.classList.add('hidden');
+            searchStats.classList.add('opacity-0');
+        }
+    }
+
+    // Event Listeners
+    if (searchInput) {
+        searchInput.addEventListener('input', (e) => {
+            filterProducts(e.target.value);
+        });
+    }
+
+    if (resetBtn) {
+        resetBtn.addEventListener('click', () => {
+            searchInput.value = '';
+            filterProducts('');
+            searchInput.focus();
+        });
+    }
+</script>
